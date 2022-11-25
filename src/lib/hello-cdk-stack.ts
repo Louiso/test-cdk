@@ -1,29 +1,29 @@
 import * as cdk from 'aws-cdk-lib';
 import { aws_s3 as s3 } from 'aws-cdk-lib';
-
-import mongoose, { Schema } from 'mongoose'
-
-const db = mongoose.createConnection("mongodb://mongo:AN6GA2LtenmKCX1T6XRl@containers-us-west-31.railway.app:7330/test?authSource=admin")
-
-const TestSchema = new Schema({
-  name: String
-})
-
-const TestModel = db.model('Test', TestSchema)
-
+import { Code, Function, Runtime } from "aws-cdk-lib/aws-lambda";
+import { Effect, PolicyStatement} from 'aws-cdk-lib/aws-iam';
 export class HelloCdkStack extends cdk.Stack {
-  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+  constructor(scope: cdk.App, id: string, props?: cdk.StackProps, environmentFromBin?: any | undefined) {
     super(scope, id, props);
 
+
+    console.log("environmentFromBin", environmentFromBin)
+
+    const eventProducerLambda = new Function(this, 'helloLambdaFunction', {
+      runtime: Runtime.NODEJS_14_X,
+      code: Code.fromAsset("dist"),
+      handler: "helloLambda.handler",
+      environment: environmentFromBin,
+    });
+
+    const eventPolicy = new PolicyStatement({
+      effect: Effect.ALLOW,
+      resources: ["*"],
+      actions: ["events:PutEvents"],
+    });
+
+    eventProducerLambda.addToRolePolicy(eventPolicy);
     
-    TestModel.create({
-      name: 'Sera'
-    }).then((doc) => {
-      console.log("doc", doc)
-
-      db.close()
-    })
-
     new s3.Bucket(this, 'MyFirstBucket', {
       versioned: true
     });
