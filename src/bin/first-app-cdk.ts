@@ -2,6 +2,7 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { FirstAppCdkStack } from '../lib/first-app-cdk-stack';
+import { HelloCdkStack } from '../lib/hello-cdk-stack';
 
 const app = new cdk.App();
 new FirstAppCdkStack(app, 'FirstAppCdkStack', {
@@ -19,3 +20,5 @@ new FirstAppCdkStack(app, 'FirstAppCdkStack', {
 
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 });
+
+new HelloCdkStack(app, 'HelloCdkStack')
